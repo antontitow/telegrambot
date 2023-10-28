@@ -6,8 +6,14 @@ import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import ru.titov.bot.config.BotConfiguration;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @autor : Anton Titov {@literal antontitow@bk.ru}
@@ -44,13 +50,32 @@ public class Bot extends TelegramLongPollingBot {
 
     private void getStarted(Long chatId, String firstName) {
         String responceMessage = "Привет " + firstName;
+
         sendMessage(chatId, responceMessage.toString());
     }
 
     private void sendMessage(Long chatId, String message) {
         SendMessage sendMessage = new SendMessage();
+        sendMessage.enableMarkdown(true);
+
+        ReplyKeyboardMarkup replyKeyboardMarkup = new
+                ReplyKeyboardMarkup();
+        sendMessage.setReplyMarkup(replyKeyboardMarkup);
+
+        List<KeyboardRow> keyboard = new ArrayList<>();
+
+        KeyboardRow keyboardFirstRow = new KeyboardRow();
+        // Добавляем кнопки в первую строчку клавиатуры
+        keyboardFirstRow.add("Команда 1");
+        keyboardFirstRow.add(KeyboardButton.builder().text("ty").build());
+        keyboardFirstRow.add("Команда 2");
+        keyboard.add(keyboardFirstRow);
+
+        replyKeyboardMarkup.setKeyboard(keyboard);
+
         sendMessage.setChatId(chatId.toString());
         sendMessage.setText(message);
+
         try {
             execute(sendMessage);
         } catch (TelegramApiException telegramApiException) {
@@ -64,7 +89,7 @@ public class Bot extends TelegramLongPollingBot {
     }
 
     @Override
-    public String getBotToken(){
+    public String getBotToken() {
         log.info("token" + configuration.getToken());
         return configuration.getToken();
     }
